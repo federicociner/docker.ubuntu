@@ -1,31 +1,63 @@
-# ubuntu-xenial Dockerfile
 FROM ubuntu:xenial
 MAINTAINER Federico Ciner <federico.ciner@gmail.com>
 
-## shutup debconf
+## Silence debconf
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Australia/Sydney
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY files/* /tmp/
 
-## install tools and utilities
+## Install tools and utilities
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    build-essential \
     apt-utils \
+    git \
+    ed \
     wget \
     vim \
     curl \
     htop \
     unzip \
-    git \
+    locales \
+    ca-certificates \
+    apt-transport-https \
     less \
     screen \
     libaio1 \
     libssl-dev \
     openjdk-9-jdk-headless \
-    libcurl4-openssl-dev \
+    g++ \
+    gcc \
+    imagemagick \
     libltdl3-dev \
+    libbz2-dev \
+    libc6-dev \
+    libcurl4-openssl-dev \
+    libdb-dev \
+    libevent-dev \
+    libffi-dev \
+    libgdbm-dev \
+    libgeoip-dev \
+    libglib2.0-dev \
+    libjpeg-dev \
+    libkrb5-dev \
+    liblzma-dev \
+    libmagickcore-dev \
+    libmagickwand-dev \
+    libncurses5-dev \
+    libncursesw5-dev \
+    libpng-dev \
+    libpq-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    libtool \
+    libwebp-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libyaml-dev \
     odbcinst1debian2 \
     unixodbc \
     unixodbc-dev \
@@ -36,7 +68,7 @@ RUN apt-get update && \
     && mv /tmp/mysql-connector-odbc-5.3.8-linux-ubuntu16.04-x86-64bit/lib/* /usr/lib/x86_64-linux-gnu/odbc/ \
     && cat /tmp/custom_odbcinst.ini >> /etc/odbcinst.ini
 
-## install MSSQL ODBC drivers
+## Install MSSQL ODBC drivers
 RUN apt-get update \
     && apt-get install apt-transport-https \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
@@ -48,11 +80,10 @@ RUN apt-get update \
     && ln -sfn /opt/mssql-tools/bin/sqlcmd /usr/bin/sqlcmd \
     && ln -sfn /opt/mssql-tools/bin/bcp /usr/bin/bcp \
     && rm /etc/apt/sources.list.d/mssql-release.list \
-    ## clean up any files used by apt-get
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-## run some tests
+## Run some tests
 ENTRYPOINT ["tini", "--"]
 
-## passing `-l` flag to bash, in order to enable login shell (and source all the `profile.d/*` stuff)
+## Passing `-l` flag to bash, in order to enable login shell
 CMD ["/bin/bash", "-l"]
